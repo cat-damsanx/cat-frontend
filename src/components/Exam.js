@@ -87,7 +87,7 @@ const Exam = () => {
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currTheta])
+  }, [currTheta, thetaPattern])
 
   useEffect(() => {
     (async () => {

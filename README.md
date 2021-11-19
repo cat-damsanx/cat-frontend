@@ -7,3 +7,7 @@ This respository is fork from [this](https://github.com/hdieuhuy/render-latex-ve
 ## To start project
 
 ### `yarn run dev`
+
+## Things to consider
+- [X] Fix case when user has estimated ability at **bound (min or max)**, but click right choice for twice time, it's block the server. (not update variable to trigger the useEffect function at bound)
+    => I fix it by considering `thetaPattern` at useEffect function.

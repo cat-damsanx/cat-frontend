@@ -5,17 +5,20 @@ import { LoadingOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 import { isEmpty } from 'lodash';
 
-import { estimateAbility, selectQuestion, checkingStop } from '../api';
+import { estimateAbility, selectQuestion, checkingStop, getPlot } from '../api';
 import '../styles/exam.css';
+
+import Result from './Result'
 
 const antIcon = (
   <LoadingOutlined style={{ fontSize: 80, color: '#74b9ff' }} spin />
 );
 
 const Exam = () => {
-  const [data, setData] = useState({});
-  const [loading, setLoading] = useState(true);
-  let [isDone, setIsDone] = useState(false);
+  const [data, setData] = useState({})
+  const [loading, setLoading] = useState(true)
+  let [isDone, setIsDone] = useState(false)
+  let [plotImg, setPlotImg] = useState('')
 
   // cat data
   let [questionIndex, setQuestionIndex] = useState(1)
@@ -47,12 +50,13 @@ const Exam = () => {
       let res = await selectQuestion({ administeredItems, currTheta })
       setData(res.data.data.exam)
       setAdministeredItems([...administeredItems, res.data.data.question_idx])
-      
+
       let level = res.data.data.exam.list_questions[0].level
       setQuestionLevelPattern([...questionLevelPattern, level])
 
       setLoading(false)
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionIndex])
 
   useEffect(() => {
@@ -64,6 +68,7 @@ const Exam = () => {
       setCurrTheta(res.data.data.theta)
       setThetaPattern([...thetaPattern, res.data.data.theta])
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [responsePattern])
 
   useEffect(() => {
@@ -73,7 +78,6 @@ const Exam = () => {
     // nếu chưa dừng thì set question lên một đơn vị
     // nếu dừng rồi thì set điều kiện dừng
     (async () => {
-      console.log("I'm checking stop rule")
       let res = await checkingStop({ administeredItems, currTheta })
       console.log(res.data.data.is_stop)
       if (!res.data.data.is_stop) {
@@ -82,7 +86,17 @@ const Exam = () => {
         setIsDone(res.data.data.is_stop)
       }
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currTheta])
+
+  useEffect(() => {
+    (async () => {
+      let res = await getPlot({ questionLevelPattern, thetaPattern, responsePattern })
+      setPlotImg('')
+      setPlotImg(res.data.data.b64Img)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDone])
 
   const responseAnswer = (answer) => {
     setResponsePattern([...responsePattern, answer])
@@ -209,13 +223,11 @@ const Exam = () => {
           </Popover>
         </div>
       )}
-        {
-          printout()
-        }
+      {
+        printout()
+      }
       {!isDone ? renderData()
-        : (<>
-          {/* <img src={`data:image/png;base64,${plotImg}`}/> */}
-        </>)
+        : <Result plotImg={plotImg} finalTheta={currTheta} />
       }
 
     </div>

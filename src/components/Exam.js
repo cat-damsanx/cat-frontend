@@ -15,6 +15,8 @@ const antIcon = (
 );
 
 const Exam = () => {
+  let examId = localStorage.getItem('exam_id')
+
   const [data, setData] = useState({})
   const [loading, setLoading] = useState(true)
   let [isDone, setIsDone] = useState(false)
@@ -47,7 +49,7 @@ const Exam = () => {
     // chỉ đổi câu hỏi khi questionIndex tăng lên
     setLoading(true);
     (async () => {
-      let res = await selectQuestion({ administeredItems, currTheta })
+      let res = await selectQuestion({ administeredItems, currTheta, examId, responsePattern })
       setData(res.data.data.exam)
       setAdministeredItems([...administeredItems, res.data.data.question_idx])
 
@@ -57,7 +59,7 @@ const Exam = () => {
       setLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questionIndex])
+  }, [questionIndex, examId])
 
   useEffect(() => {
     if (!responsePattern.length) return;
@@ -78,7 +80,7 @@ const Exam = () => {
     // nếu chưa dừng thì set question lên một đơn vị
     // nếu dừng rồi thì set điều kiện dừng
     (async () => {
-      let res = await checkingStop({ administeredItems, currTheta })
+      let res = await checkingStop({ administeredItems, currTheta, examId })
       console.log(res.data.data.is_stop)
       if (!res.data.data.is_stop) {
         setQuestionIndex(questionIndex + 1)

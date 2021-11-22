@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
-import { createCatExam } from '../api'
+import { getExamId } from '../api'
 
 
 const Main = () => {
+    let [examId, setExamId] = useState(null)
 
     return (
         <>
             <h3 id="title">Entrance test</h3>
             <Button
                 onClick={() => {
-                    createCatExam()
+                    getExamId()
                         .then((res) => {
-                            localStorage.setItem('catIndex', res.data.data.cat_index);
+                            localStorage.setItem('exam_id', res.data.data.exam_id);
+                            setExamId(res.data.data.exam_id)
                         });
                 }}
             >
-                Create CAT Test {localStorage.getItem('catIndex')}
+                Current Exam ID: {examId}
             </Button>
         </>
     )
